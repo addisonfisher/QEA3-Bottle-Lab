@@ -1,38 +1,36 @@
 function analyze_data()
     %THE VALUES HERE ARE JUST PLACEHOLDERS
     %You will need to change them!!!
-    fpath = 'C:\Users\taylorott\'; %path string (must end with \)
-    fname = 'bottle_data01.xls'; %spreadsheet file name
-    sheet_name = 'Sheet1';
-    cell_range = 'A2:F7';
+    fpath = 'C:\Users\afisher\OneDrive - Olin College of Engineering\Documents\Classes\QEA3\QEA3-Bottle-Lab\'; %path string (must end with \)
+    fname = 'data.csv'; %spreadsheet file name
     %concatenate path and filename
     file_string = [fpath,fname];
-    data_mat = readmatrix(file_string,'Sheet',sheet_name,'Range',cell_range);
+    data_mat = readmatrix(file_string); % Read CSV file directly
     %pull the lists of masses and frequencies out of
     %data_mat, so each can manipulated independently
-    total_mass_list =
-    freq_list =
+    total_mass_list = data_mat(:,1);
+    freq_list = data_mat(:,2);
 
-    water_density = %density of water
-    air_density = %density of air
-    gamma_air = %heat capacity ratio of air
-    P0 = %the ambient (atmospheric) pressure in Needham
-    neck_diameter = %inner diameter of bottle opening
-    neck_length = %length of the bottle neck
-    empty_bottle_mass = %mass of completely empty bottle
-    filled_bottle_mass = %mass of completely filled bottle
+    water_density = 0.9982;   
+    air_density = 1.234; %kg/m^3
+    gamma_air = 1.403;
+    P0 = 1.014*10^5;
+    neck_diameter = 0.03; %m
+    neck_length = 0.08; %length of the bottle neck, m
+    empty_bottle_mass = min(total_mass_list); %mass of completely empty bottle, kg
+    filled_bottle_mass = max(total_mass_list); %mass of completely filled bottle
 
-    area_cx = %cross-sectional area of bottle neck
-    neck_volume = %volume of bottle neck
-    neck_air_mass = %mass of air in bottle neck
-    bottle_volume = %total volume that the bottle can hold
-    empty_cavity_volume = %volume of the cavity (without any water)
+    area_cx = (neck_diameter/2) * pi; %cross-sectional area of bottle neck, m^2
+    neck_volume = area_cx * neck_length; %volume of bottle neck
+    neck_air_mass = neck_volume * air_density; %mass of air in bottle neck
+    empty_cavity_volume = water_density*(filled_bottle_mass-empty_bottle_mass);
+    bottle_volume = neck_volume + empty_cavity_volume; %total volume that the bottle can hold
 
-    water_mass_list = %mass of water inside the bottle (list)
-    water_volume_list = %volume of water inside the bottle (list)
+    water_mass_list = total_mass_list - empty_bottle_mass; %mass of water inside the bottle (list)
+    water_volume_list = water_mass_list .* water_density; %volume of water inside the bottle (list)
     %total volume of air inside the bottle (cavity AND neck)
     %for different amounts of water (list)
-    air_volume_list =
+    air_volume_list = bottle_volume - water_volume_list;
 
     max_volume = max(air_volume_list);
     max_freq = max(freq_list);
@@ -45,19 +43,21 @@ function analyze_data()
     ylabel('');
     title('');
 
-    n_points = %number of points
+    n_points = length(air_volume_list); %number of points
     %generate a range of cavity volumes from empty to full
     V0_list = linspace(empty_cavity_volume/100, empty_cavity_volume, n_points);
 
     %list of predicted stiffnesses for each cavity volume
     %remember to use the ./ (elementwise division) when
     %doing division, instead of just using / !
-    predicted_k_list =
+    predicted_k_list = (2 * pi * freq_list).^2 .* water_density;
     %list of predicted frequencies for each cavity volume
-    predicted_freq_list =
+
+    m = water_mass_list;
+    predicted_freq_list = sqrt(predicted_k_list/m);
     %total volume (cavity + neck) of air inside the bottle
     %for each cavity volume
-    predicted_total_volume =
+    predicted_total_volume = V0_list + neck_volume;
 
     %plot the predicted values on the same axes as the measured values
     plot(predicted_total_volume,predicted_freq_list,'k','linewidth',2);

@@ -63,7 +63,7 @@ function run_sound_test()
     %generate vector of points for each sample time (in seconds)
     t_list = (0:length(y)-1)/Fs;
 
-    min_freq = 300; %min cutoff frequency in rad/sec 
+    min_freq = 1000; %min cutoff frequency in rad/sec 
     max_freq = 1e5; %max cutoff frequency in rad/sec
 
     %compute primary frequency component of recorded sound
