@@ -8,14 +8,15 @@ function analyze_data()
     data_mat = readmatrix(file_string); % Read CSV file directly
     %pull the lists of masses and frequencies out of
     %data_mat, so each can manipulated independently
-    total_mass_list = data_mat(:,1) / 1000 ;
+    total_mass_list = data_mat(:,1) / 1000;
+    %freq_list = data_mat(:,2);
     freq_list = data_mat(:,2);
 
     water_density = 998.2; %kg/m^3   
     air_density = 1.234; %kg/m^3
     gamma_air = 1.403;
     P0 = 1.014*10^5;
-    neck_diameter = 0.01913; %m
+    neck_diameter = 0.03; %m
     neck_length = 0.08; %length of the bottle neck, m
     empty_bottle_mass = min(total_mass_list); %mass of completely empty bottle, kg
     filled_bottle_mass = max(total_mass_list); %mass of completely filled bottle
@@ -40,7 +41,7 @@ function analyze_data()
     figure;
     hold on;
     axis([0,1.1*max_volume,0,1.1*max_freq]);
-    plot(air_volume_list + 0.000009,freq_list,'ro','markerfacecolor','r');
+    plot(air_volume_list,freq_list,'ro','markerfacecolor','r');
     %remember to include axis labels and a title!!!
     xlabel('Total Air Volume (m^3)');
     ylabel('Frequency (Hz)'); 
@@ -58,7 +59,7 @@ function analyze_data()
     predicted_freq_list = (1 / (2*pi)) .* sqrt(predicted_k_list ./ neck_air_mass);
     %total volume (cavity + neck) of air inside the bottle
     %for each cavity volume
-    predicted_total_volume = V0_list;
+    predicted_total_volume = V0_list + neck_volume;
 
     %plot the predicted values on the same axes as the measured values
     plot(predicted_total_volume,predicted_freq_list * 1,'k','linewidth',2);
